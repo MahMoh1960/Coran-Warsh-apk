@@ -17,6 +17,7 @@ jobs:
           cp AndroidManifest.xml app/src/main/
           if [ -f UthmanicWarsh.ttf ]; then cp UthmanicWarsh.ttf app/src/main/assets/fonts/; fi
           if [ -f UthmanTaha.ttf ]; then cp UthmanTaha.ttf app/src/main/assets/fonts/; fi
+          if [ -d fonts ]; then cp fonts/* app/src/main/assets/fonts/; fi
           cat > settings.gradle <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositories { google(); mavenCentral() } }
