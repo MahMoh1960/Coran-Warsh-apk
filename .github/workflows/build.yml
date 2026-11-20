@@ -16,6 +16,7 @@ jobs:
           cp MainActivity.java app/src/main/java/com/coran/warsh/
           cp AndroidManifest.xml app/src/main/
           if [ -f UthmanicWarsh.ttf ]; then cp UthmanicWarsh.ttf app/src/main/assets/fonts/; fi
+          if [ -f UthmanTaha.ttf ]; then cp UthmanTaha.ttf app/src/main/assets/fonts/; fi
           cat > settings.gradle <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositories { google(); mavenCentral() } }
@@ -25,10 +26,7 @@ jobs:
           cat > build.gradle <<'EOF'
           plugins { id 'com.android.application' version '8.5.2' apply false }
           EOF
-          cat > gradle.properties <<'EOF'
-          android.useAndroidX=true
-          org.gradle.jvmargs=-Xmx2g
-          EOF
+          echo "org.gradle.jvmargs=-Xmx2g" > gradle.properties
           cat > app/build.gradle <<'EOF'
           plugins { id 'com.android.application' }
           android {
