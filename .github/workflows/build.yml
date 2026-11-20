@@ -21,7 +21,6 @@ jobs:
           dependencyResolutionManagement { repositories { google(); mavenCentral() } }
           rootProject.name = "CoranWarsh"
           include ':app'
-
           EOF
           cat > build.gradle <<'EOF'
           plugins { id 'com.android.application' version '8.5.2' apply false }
@@ -55,3 +54,5 @@ jobs:
         with:
           name: coran-warsh-apk
           path: app/build/outputs/apk/debug/*.apk
+
+         
