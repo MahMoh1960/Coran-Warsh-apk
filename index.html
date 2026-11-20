@@ -12,7 +12,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;gap:8px;padding:8px;background:var(--bg2);border-bottom:1px solid var(--line)}
 select,input,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
 select{flex:1;min-width:0}button{cursor:pointer}button:active{background:var(--line)}
-#text{max-width:760px;margin:0 auto;padding:18px 16px 190px;font-family:var(--ff);font-size:var(--fs,30px);line-height:2.1;direction:rtl;text-align:justify;user-select:text;-webkit-user-select:text}
+#text{max-width:760px;margin:0 auto;padding:18px 16px 190px;font-family:var(--ff);font-size:var(--fs,30px);line-height:var(--lh,2.1);direction:rtl;text-align:justify;user-select:text;-webkit-user-select:text}
 .title{text-align:center;font-size:1.25em;font-weight:700;border:1px solid var(--dim);border-radius:12px;padding:6px;margin-bottom:10px}
 .bsm{text-align:center;margin-bottom:8px}
 .v{cursor:pointer}.v.on{background:var(--hl,#2a3a7a);border-radius:6px}.n{color:var(--dim);font-weight:400;font-size:.7em}
@@ -39,12 +39,14 @@ body.full header{display:none}body.full #fx{display:block}body.full::before{back
 #cb{overflow:auto;padding:8px 12px calc(24px + env(safe-area-inset-bottom,0px))}#cb h3{margin:16px 0 8px;color:var(--dim);font-size:14px}
 .opt{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer}.opt b{font-size:22px;direction:rtl;font-weight:400}.opt span{font:13px system-ui;color:var(--dim)}
 .opt.a,.sw.a{outline:2px solid var(--fg)}.th{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sw{border:1px solid;border-radius:12px;padding:12px;text-align:center;cursor:pointer}.sw b{display:block;font-size:22px;font-weight:400}.sw small{font:12px system-ui}
+#spw{display:flex;align-items:center;justify-content:center;gap:10px}#spw b{min-width:2ch;text-align:center;font-size:22px}#spw button{min-width:44px}
+.stp{display:flex;align-items:center;justify-content:center;gap:14px}.stp b{font-size:24px;min-width:3ch;text-align:center}.stp button{min-width:52px}
 </style></head><body>
 <header><select id="sel" aria-label="Sourate"></select><button id="bi" aria-label="Index">☰</button><button id="bs" aria-label="Rechercher">🔍</button><button id="bcfg" aria-label="Réglages">⚙</button><button id="fsb" aria-label="Plein écran">⛶</button></header>
 <button id="fx" aria-label="Quitter le plein écran">✕</button>
 <main id="text"></main>
 <div id="sheet"><b id="ref"></b><button id="bc">Copier</button><button id="bsh">Partager</button><button id="bk">★ Signet</button><button id="bx">✕</button></div>
-<div id="bar"><button id="play" aria-label="Défilement">▶</button><input id="spd" type="range" min="5" max="250" value="40" aria-label="Vitesse"><button id="sm">A−</button><button id="sp">A+</button><span class="lbl" id="lbl"></span></div>
+<div id="bar"><button id="play" aria-label="Défilement">▶</button><div id="spw" aria-label="Vitesse"><button id="vm">−</button><b id="vn">3</b><button id="vp">+</button></div><button id="sm">A−</button><button id="sp">A+</button><span class="lbl" id="lbl"></span></div>
 <div id="panel"><div id="ph"><input id="q" type="search" placeholder="ابحث في الآيات…" autocomplete="off"><button id="pc">✕</button></div><div id="res"></div></div>
 <div id="cfg"><div id="ch"><button id="cx">✕</button><span>الإعدادات · Réglages</span></div><div id="cb"></div></div>
 <div id="ip"><div id="ph"><input id="is" type="search" placeholder="رقم أو اسم سورة…" autocomplete="off"><button id="ic">✕</button></div><div id="it"><button class="a" data-t="s">السور</button><button data-t="j">الأجزاء</button><button data-t="h">الأحزاب</button></div><div id="il"></div></div>
@@ -53,7 +55,7 @@ const D=[{"n": "اُ۬لْفَاتِحَةِ", "v": ["بِسْمِ اِ۬للّ�
 const $=id=>document.getElementById(id),AR="٠١٢٣٤٥٦٧٨٩",ar=n=>String(n).replace(/\d/g,d=>AR[d]);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let cur=store.get("cur",0),fs=store.get("fs",30),playing=false,acc=0,last=0,pick=null,marks=store.get("marks",[]);
-$("spd").value=store.get("spd",40);document.documentElement.style.setProperty("--fs",fs+"px");
+let lvl=store.get("lvl",3);const SPEEDS=[8,15,25,38,55,75,100,130,170,220];$("vn").textContent=lvl;document.documentElement.style.setProperty("--fs",fs+"px");
 D.forEach((s,i)=>$("sel").add(new Option((i+1)+" · "+s.n,i)));
 const clean=(s,v)=>v==0&&s.v[0].startsWith(BASM)?s.v[0].slice(BASM.length).trim():s.v[v];
 const hasB=i=>D[i].v[0].startsWith(BASM);
@@ -78,12 +80,13 @@ $("bsh").onclick=()=>{const t=vt(pick);if(window.Android&&Android.share)Android.
 $("bk").onclick=()=>{const j=marks.findIndex(m=>m[0]==pick.i&&m[1]==pick.k);j>=0?marks.splice(j,1):marks.push([pick.i,pick.k]);store.set("marks",marks);refBk()};
 $("sm").onclick=()=>setFs(fs-2);$("sp").onclick=()=>setFs(fs+2);
 function setFs(n){fs=Math.max(18,Math.min(60,n));store.set("fs",fs);document.documentElement.style.setProperty("--fs",fs+"px")}
-function tick(t){if(!playing)return;const dt=Math.min(.1,(t-last)/1000);last=t;acc+=(+$("spd").value)*dt;
+function tick(t){if(!playing)return;const dt=Math.min(.1,(t-last)/1000);last=t;acc+=SPEEDS[lvl-1]*dt;
  if(acc>=1){const p=Math.floor(acc);acc-=p;const y=scrollY;window.scrollBy(0,p);
   if(Math.abs(scrollY-y)<1&&y>200){if(cur<113)render(cur+1);else setPlay(false)}}
  requestAnimationFrame(tick)}
 function setPlay(on){playing=on;$("play").textContent=on?"⏸":"▶";if(on){last=performance.now();acc=0;requestAnimationFrame(tick)}}
-$("play").onclick=()=>setPlay(!playing);$("spd").oninput=e=>store.set("spd",+e.target.value);
+$("play").onclick=()=>setPlay(!playing);function setSpd(n){lvl=Math.max(1,Math.min(10,n));store.set("lvl",lvl);$("vn").textContent=lvl}
+$("vm").onclick=()=>setSpd(lvl-1);$("vp").onclick=()=>setSpd(lvl+1);
 addEventListener("touchstart",e=>{if(playing&&!e.target.closest("#bar"))setPlay(false)},{passive:true});
 addEventListener("wheel",()=>{if(playing)setPlay(false)},{passive:true});
 /* Recherche */
@@ -127,16 +130,16 @@ $("il").onclick=e=>{const x=e.target.closest(".ix");if(!x)return;$("ip").classLi
 /* Réglages : police + fond */
 const FONTS=[["warsh","Warsh (Uthmanic)",'"Warsh","Scheherazade New","Amiri Quran",serif'],["taha","Uthman Taha",'"UthmanTaha","Scheherazade New","Amiri Quran",serif'],["sch","Scheherazade New",'"Scheherazade New","Noto Naskh Arabic",serif'],["amq","Amiri Quran",'"Amiri Quran","Scheherazade New",serif'],["ami","Amiri",'"Amiri","Scheherazade New",serif'],["nsk","Noto Naskh",'"Noto Naskh Arabic","Scheherazade New",serif'],["lat","Lateef",'"Lateef","Scheherazade New",serif']];
 const THEMES=[["Bleu nuit · jaune","#0a1330","#121d45","#ffd84a","#b9a23a","#25356e","#2a3a7a"],["Noir · blanc","#000000","#141414","#f2f2f2","#9a9a9a","#2e2e2e","#2e2e2e"],["Noir · vert","#000000","#0d1a0d","#86e08f","#4f8f58","#1f3a22","#1f3a22"],["Vert mushaf · or","#0b3d2e","#0f4d3a","#f0d27a","#b9a766","#1f6b52","#1a6a50"],["Papier crème · brun","#f6ecd2","#eadcb8","#3b2a14","#7a6440","#d3c299","#e3d3a6"],["Blanc · noir","#ffffff","#eef0f5","#111111","#666666","#d5d8e0","#e3e7f3"],["Marine · crème","#10233f","#17325a","#f4efe0","#a8b4c8","#2c4a7a","#2c4a7a"],["Brun nuit · ambre","#1c130c","#2a1d12","#ffbf5e","#b58a4a","#4a3320","#3a2816"]];
-let fnt=store.get("font","warsh"),thm=store.get("theme",0);
+const LH=[1.6,1.8,2,2.1,2.4,2.8,3.2];let fnt=store.get("font","warsh"),thm=store.get("theme",0),li=store.get("li",3);
 function applyLook(){const f=FONTS.find(x=>x[0]==fnt)||FONTS[0],t=THEMES[thm]||THEMES[0],s=document.documentElement.style;
- s.setProperty("--ff",f[2]);["--bg","--bg2","--fg","--dim","--line","--hl"].forEach((k,i)=>s.setProperty(k,t[i+1]));
+ s.setProperty("--ff",f[2]);s.setProperty("--lh",LH[li]||2.1);["--bg","--bg2","--fg","--dim","--line","--hl"].forEach((k,i)=>s.setProperty(k,t[i+1]));
  const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t[1]}
 function cfgRender(){$("cb").innerHTML='<h3>الخط · Police</h3>'+FONTS.map(f=>'<div class="opt'+(f[0]==fnt?' a':'')+'" data-f="'+f[0]+'" style="font-family:'+f[2].replace(/"/g,"'")+'"><span>'+f[1]+'</span><b>بِسْمِ اِ۬للَّهِ اِ۬لرَّحْمَٰنِ</b></div>').join("")
  +'<h3>الخلفية · Fond</h3><div class="th">'+THEMES.map((t,i)=>'<div class="sw'+(i==thm?' a':'')+'" data-t="'+i+'" style="background:'+t[1]+';color:'+t[3]+';border-color:'+t[4]+'"><b>بِسْمِ اللَّهِ</b><small>'+t[0]+'</small></div>').join("")
- +'</div><div class="hint">Warsh et Uthman Taha s’affichent si leur fichier de police est installé (dans l’APK : dossier fonts). Sinon, une police voisine est utilisée.</div>'}
+ +'</div><h3>الارتفاع · Interligne</h3><div class="stp"><button data-l="-1">−</button><b>'+LH[li]+'</b><button data-l="1">+</button></div><div class="hint">Warsh et Uthman Taha s’affichent si leur fichier de police est installé (dans l’APK : dossier fonts). Sinon, une police voisine est utilisée.</div>'}
 $("bcfg").onclick=()=>{setPlay(false);cfgRender();$("cfg").classList.add("open")};
 $("cx").onclick=()=>$("cfg").classList.remove("open");
-$("cb").onclick=e=>{const o=e.target.closest(".opt"),w=e.target.closest(".sw");if(o){fnt=o.dataset.f;store.set("font",fnt)}else if(w){thm=+w.dataset.t;store.set("theme",thm)}else return;applyLook();cfgRender()};
+$("cb").onclick=e=>{const l=e.target.closest("[data-l]");if(l){li=Math.max(0,Math.min(LH.length-1,li+(+l.dataset.l)));store.set("li",li);applyLook();cfgRender();return}const o=e.target.closest(".opt"),w=e.target.closest(".sw");if(o){fnt=o.dataset.f;store.set("font",fnt)}else if(w){thm=+w.dataset.t;store.set("theme",thm)}else return;applyLook();cfgRender()};
 /* Polices personnalisées (APK) : tout fichier .ttf/.otf du dossier fonts */
 try{if(window.Android&&Android.fonts){JSON.parse(Android.fonts()).forEach(fn=>{
  const base=fn.replace(/\.[^.]+$/,""),fam="F_"+base.replace(/[^A-Za-z0-9]/g,"_"),url="url('fonts/"+encodeURI(fn)+"')";
