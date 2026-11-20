@@ -28,6 +28,22 @@ public class MainActivity extends Activity {
                 i.putExtra(Intent.EXTRA_TEXT, t);
                 startActivity(Intent.createChooser(i, null));
             }
+            @JavascriptInterface public String fonts() {
+                try {
+                    String[] f = getAssets().list("fonts");
+                    StringBuilder sb = new StringBuilder("[");
+                    boolean first = true;
+                    for (String n : f) {
+                        String l = n.toLowerCase();
+                        if (l.endsWith(".ttf") || l.endsWith(".otf")) {
+                            if (!first) sb.append(",");
+                            sb.append("\"").append(n.replace("\\", "\\\\").replace("\"", "\\\"")).append("\"");
+                            first = false;
+                        }
+                    }
+                    return sb.append("]").toString();
+                } catch (Exception e) { return "[]"; }
+            }
             @JavascriptInterface public void fullscreen(final boolean on) {
                 runOnUiThread(new Runnable() { public void run() { setFull(on); } });
             }

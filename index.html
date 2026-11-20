@@ -137,6 +137,13 @@ function cfgRender(){$("cb").innerHTML='<h3>الخط · Police</h3>'+FONTS.map(f
 $("bcfg").onclick=()=>{setPlay(false);cfgRender();$("cfg").classList.add("open")};
 $("cx").onclick=()=>$("cfg").classList.remove("open");
 $("cb").onclick=e=>{const o=e.target.closest(".opt"),w=e.target.closest(".sw");if(o){fnt=o.dataset.f;store.set("font",fnt)}else if(w){thm=+w.dataset.t;store.set("theme",thm)}else return;applyLook();cfgRender()};
+/* Polices personnalisées (APK) : tout fichier .ttf/.otf du dossier fonts */
+try{if(window.Android&&Android.fonts){JSON.parse(Android.fonts()).forEach(fn=>{
+ const base=fn.replace(/\.[^.]+$/,""),fam="F_"+base.replace(/[^A-Za-z0-9]/g,"_"),url="url('fonts/"+encodeURI(fn)+"')";
+ const add=n=>{try{const ff=new FontFace(n,url);document.fonts.add(ff);ff.load().catch(()=>{})}catch(_){}};
+ add(fam);if(/warsh/i.test(fn))add("Warsh");if(/taha/i.test(fn))add("UthmanTaha");
+ if(!FONTS.some(f=>f[0]==fam))FONTS.push([fam,base,'"'+fam+'","Scheherazade New","Amiri Quran",serif']);
+})}}catch(_){}
 applyLook();
 /* Plein écran */
 function setFull(on){document.body.classList.toggle("full",on);try{if(window.Android&&Android.fullscreen)Android.fullscreen(on)}catch(_){}const d=document,e=d.documentElement;
