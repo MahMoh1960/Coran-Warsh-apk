@@ -9,6 +9,7 @@ jobs:
         with: { distribution: temurin, java-version: 17 }
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: 8.9 }
+      - uses: android-actions/setup-android@v3
       - name: Assembler le projet Android
         run: |
           mkdir -p app/src/main/assets/fonts app/src/main/java/com/coran/warsh app/src/main/res/drawable
@@ -25,7 +26,10 @@ jobs:
           cat > build.gradle <<'EOF'
           plugins { id 'com.android.application' version '8.5.2' apply false }
           EOF
-          echo "org.gradle.jvmargs=-Xmx2g" > gradle.properties
+          cat > gradle.properties <<'EOF'
+          android.useAndroidX=true
+          org.gradle.jvmargs=-Xmx2g
+          EOF
           cat > app/build.gradle <<'EOF'
           plugins { id 'com.android.application' }
           android {
@@ -43,8 +47,7 @@ jobs:
           }
           EOF
           cat > app/src/main/res/drawable/ic_launcher.xml <<'EOF'
-          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" androi
-          d:viewportHeight="108">
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
               <path android:fillColor="#0A1330" android:pathData="M0,0h108v108h-108z"/>
               <path android:fillColor="#FFD84A" android:pathData="M30,34h48v6h-48z M30,50h48v6h-48z M30,66h48v6h-48z"/>
           </vector>
@@ -54,5 +57,3 @@ jobs:
         with:
           name: coran-warsh-apk
           path: app/build/outputs/apk/debug/*.apk
-
-         
