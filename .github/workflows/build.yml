@@ -1,0 +1,57 @@
+name: Build APK
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: 8.9 }
+      - name: Assembler le projet Android
+        run: |
+          mkdir -p app/src/main/assets/fonts app/src/main/java/com/coran/warsh app/src/main/res/drawable
+          cp index.html app/src/main/assets/
+          cp MainActivity.java app/src/main/java/com/coran/warsh/
+          cp AndroidManifest.xml app/src/main/
+          if [ -f UthmanicWarsh.ttf ]; then cp UthmanicWarsh.ttf app/src/main/assets/fonts/; fi
+          cat > settings.gradle <<'EOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement { repositories { google(); mavenCentral() } }
+          rootProject.name = "CoranWarsh"
+          include ':app'
+
+          EOF
+          cat > build.gradle <<'EOF'
+          plugins { id 'com.android.application' version '8.5.2' apply false }
+          EOF
+          echo "org.gradle.jvmargs=-Xmx2g" > gradle.properties
+          cat > app/build.gradle <<'EOF'
+          plugins { id 'com.android.application' }
+          android {
+              namespace 'com.coran.warsh'
+              compileSdk 34
+              defaultConfig {
+                  applicationId 'com.coran.warsh'
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName '1.0'
+              }
+              compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+              androidResources { noCompress 'html' }
+          }
+          EOF
+          cat > app/src/main/res/drawable/ic_launcher.xml <<'EOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" androi
+          d:viewportHeight="108">
+              <path android:fillColor="#0A1330" android:pathData="M0,0h108v108h-108z"/>
+              <path android:fillColor="#FFD84A" android:pathData="M30,34h48v6h-48z M30,50h48v6h-48z M30,66h48v6h-48z"/>
+          </vector>
+          EOF
+      - run: gradle assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coran-warsh-apk
+          path: app/build/outputs/apk/debug/*.apk
