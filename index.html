@@ -30,7 +30,7 @@ select{flex:1;min-width:0}button{cursor:pointer}button:active{background:var(--l
 .hint{color:var(--dim);padding:14px;text-align:center}
 #fx{display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:8px;z-index:35;opacity:.65;padding:7px 11px}
 body.full header{display:none}body.full #fx{display:block}body.full::before{background:var(--bg)}
-#ip,#cfg{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}#ip.open,#cfg.open{display:flex}
+#ip,#cfg,#np{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}#ip.open,#cfg.open,#np.open{display:flex}
 #it{display:flex;gap:6px;padding:8px;background:var(--bg2);border-bottom:1px solid var(--line)}#it button{flex:1}#it button.a{background:var(--fg);color:var(--bg);font-weight:700}#is{flex:1;min-width:0;direction:rtl}
 #il{overflow:auto;padding:4px 12px calc(20px + env(safe-area-inset-bottom,0px));direction:rtl}
 .ix{display:flex;align-items:center;gap:10px;padding:12px 6px;border-bottom:1px solid var(--line);cursor:pointer;font-family:var(--ff);font-size:22px}.ix:active{background:var(--bg2)}
@@ -41,13 +41,20 @@ body.full header{display:none}body.full #fx{display:block}body.full::before{back
 .opt.a,.sw.a{outline:2px solid var(--fg)}.th{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sw{border:1px solid;border-radius:12px;padding:12px;text-align:center;cursor:pointer}.sw b{display:block;font-size:22px;font-weight:400}.sw small{font:12px system-ui}
 #spw{display:flex;align-items:center;justify-content:center;gap:10px}#spw b{min-width:2ch;text-align:center;font-size:22px}#spw button{min-width:44px}
 .stp{display:flex;align-items:center;justify-content:center;gap:14px}.stp b{font-size:24px;min-width:3ch;text-align:center}.stp button{min-width:52px}
+header button{padding:9px 8px}
+#nb{overflow:auto;padding:8px 12px calc(24px + env(safe-area-inset-bottom,0px))}#nb h3{margin:8px 0;color:var(--dim);font-size:14px}
+.nt{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}.nt .vt{direction:rtl;font-family:var(--ff);font-size:22px;line-height:2;user-select:text}
+.nt small{display:block;color:var(--dim);font:12px system-ui;margin:4px 0}
+#nb textarea{width:100%;min-height:54px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px;font:15px system-ui;resize:vertical}
+.nt .bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.nt .bt button,#nall{padding:6px 10px;font-size:13px}#nall{margin:8px 0}
 </style></head><body>
-<header><select id="sel" aria-label="Sourate"></select><button id="bi" aria-label="Index">☰</button><button id="bs" aria-label="Rechercher">🔍</button><button id="bcfg" aria-label="Réglages">⚙</button><button id="fsb" aria-label="Plein écran">⛶</button></header>
+<header><select id="sel" aria-label="Sourate"></select><button id="bi" aria-label="Index">☰</button><button id="bs" aria-label="Rechercher">🔍</button><button id="bnp" aria-label="Bloc-notes">📝</button><button id="bcfg" aria-label="Réglages">⚙</button><button id="fsb" aria-label="Plein écran">⛶</button></header>
 <button id="fx" aria-label="Quitter le plein écran">✕</button>
 <main id="text"></main>
-<div id="sheet"><b id="ref"></b><button id="bc">Copier</button><button id="bsh">Partager</button><button id="bk">★ Signet</button><button id="bx">✕</button></div>
+<div id="sheet"><b id="ref"></b><button id="bc">Copier</button><button id="bsh">Partager</button><button id="bk">★ Signet</button><button id="bn">📝 Noter</button><button id="bx">✕</button></div>
 <div id="bar"><button id="play" aria-label="Défilement">▶</button><div id="spw" aria-label="Vitesse"><button id="vm">−</button><b id="vn">3</b><button id="vp">+</button></div><button id="sm">A−</button><button id="sp">A+</button><span class="lbl" id="lbl"></span></div>
 <div id="panel"><div id="ph"><input id="q" type="search" placeholder="ابحث في الآيات…" autocomplete="off"><button id="pc">✕</button></div><div id="res"></div></div>
+<div id="np"><div id="ch"><button id="nx2">✕</button><span>دفتر الملاحظات · Bloc-notes</span></div><div id="nb"></div></div>
 <div id="cfg"><div id="ch"><button id="cx">✕</button><span>الإعدادات · Réglages</span></div><div id="cb"></div></div>
 <div id="ip"><div id="ph"><input id="is" type="search" placeholder="رقم أو اسم سورة…" autocomplete="off"><button id="ic">✕</button></div><div id="it"><button class="a" data-t="s">السور</button><button data-t="j">الأجزاء</button><button data-t="h">الأحزاب</button></div><div id="il"></div></div>
 <script>
@@ -71,7 +78,7 @@ $("text").addEventListener("click",e=>{if(e.target.id=="nx"){render(cur+1);retur
  if(String(getSelection()))return;const v=e.target.closest(".v");if(!v)return;
  document.querySelectorAll(".v.on").forEach(x=>x.classList.remove("on"));v.classList.add("on");
  pick={i:cur,k:+v.dataset.k};$("ref").textContent=D[cur].n+" — "+(pick.k+1);$("sheet").style.display="flex";refBk()});
-function refBk(){$("bk").textContent=marks.some(m=>m[0]==pick.i&&m[1]==pick.k)?"★ Retirer":"☆ Signet"}
+function refBk(){refNT();$("bk").textContent=marks.some(m=>m[0]==pick.i&&m[1]==pick.k)?"★ Retirer":"☆ Signet"}
 function closeSheet(){$("sheet").style.display="none";document.querySelectorAll(".v.on").forEach(x=>x.classList.remove("on"))}
 $("bx").onclick=closeSheet;
 const vt=p=>clean(D[p.i],p.k)+" ﴿"+ar(p.k+1)+"﴾ — سورة "+D[p.i].n;
@@ -148,6 +155,27 @@ try{if(window.Android&&Android.fonts){JSON.parse(Android.fonts()).forEach(fn=>{
  if(!FONTS.some(f=>f[0]==fam))FONTS.push([fam,base,'"'+fam+'","Scheherazade New","Amiri Quran",serif']);
 })}}catch(_){}
 applyLook();
+/* Bloc-notes : versets à retenir + notes */
+let NT=store.get("notes",{items:[],gen:""});
+const saveNT=()=>store.set("notes",NT),hasNT=(i,k)=>NT.items.findIndex(x=>x.i==i&&x.k==k),esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function refNT(){$("bn").textContent=hasNT(pick.i,pick.k)>=0?"📝 ✓ Noté":"📝 Noter"}
+const vtxt=x=>clean(D[x.i],x.k)+" ﴿"+ar(x.k+1)+"﴾ — سورة "+D[x.i].n;
+async function cpy(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}}
+function ntRender(){let h='<h3>ملاحظات عامة · Notes libres</h3><textarea id="ng" placeholder="Écrivez ici…">'+esc(NT.gen||"")+'</textarea><h3>آيات للحفظ · Versets à retenir ('+NT.items.length+')</h3>';
+ if(NT.items.length)h+='<button id="nall">Tout copier</button>';
+ NT.items.forEach((x,n)=>{h+='<div class="nt" data-n="'+n+'"><div class="vt">'+clean(D[x.i],x.k)+' <span class="n">﴿'+ar(x.k+1)+'﴾</span></div><small>سورة '+D[x.i].n+' · '+(x.k+1)+'</small><textarea data-n="'+n+'" placeholder="Ma note sur ce verset…">'+esc(x.note||"")+'</textarea><div class="bt"><button data-a="go">Aller au verset</button><button data-a="cp">Copier</button><button data-a="del">Supprimer</button></div></div>'});
+ if(!NT.items.length)h+='<div class="hint">Aucun verset pour l’instant. Touchez un verset, puis « 📝 Noter ».</div>';
+ $("nb").innerHTML=h}
+$("nb").oninput=e=>{if(e.target.id=="ng"){NT.gen=e.target.value;saveNT()}else if(e.target.dataset.n!=null){NT.items[+e.target.dataset.n].note=e.target.value;saveNT()}};
+$("nb").onclick=e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.id=="nall"){cpy((NT.gen?NT.gen+"\n\n":"")+NT.items.map(x=>vtxt(x)+(x.note?"\n"+x.note:"")).join("\n\n"));b.textContent="Copié ✓";return}
+ const w=b.closest(".nt");if(!w)return;const n=+w.dataset.n,x=NT.items[n];
+ if(b.dataset.a=="go"){$("np").classList.remove("open");render(x.i,x.k)}
+ else if(b.dataset.a=="cp"){cpy(vtxt(x)+(x.note?"\n"+x.note:""));b.textContent="Copié ✓"}
+ else if(b.dataset.a=="del"){NT.items.splice(n,1);saveNT();ntRender()}};
+$("bn").onclick=()=>{const j=hasNT(pick.i,pick.k);if(j>=0)NT.items.splice(j,1);else NT.items.push({i:pick.i,k:pick.k,note:""});saveNT();refNT()};
+$("bnp").onclick=()=>{setPlay(false);ntRender();$("np").classList.add("open")};
+$("nx2").onclick=()=>$("np").classList.remove("open");
 /* Plein écran */
 function setFull(on){document.body.classList.toggle("full",on);try{if(window.Android&&Android.fullscreen)Android.fullscreen(on)}catch(_){}const d=document,e=d.documentElement;
  try{if(on){const r=e.requestFullscreen||e.webkitRequestFullscreen;if(r)Promise.resolve(r.call(e)).catch(()=>{})}
