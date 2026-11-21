@@ -12,7 +12,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;gap:8px;padding:8px;background:var(--bg2);border-bottom:1px solid var(--line)}
 select,input,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
 select{flex:1;min-width:0}button{cursor:pointer}button:active{background:var(--line)}
-#text{max-width:760px;margin:0 auto;padding:18px 16px 190px;font-family:var(--ff);font-size:var(--fs,30px);line-height:var(--lh,2.1);direction:rtl;text-align:justify;user-select:text;-webkit-user-select:text}
+#text{max-width:760px;margin:0 auto;padding:18px 16px 190px;font-family:var(--ff);font-size:var(--fs,30px);line-height:var(--lh,2.1);direction:rtl;text-align:var(--ta,justify);user-select:text;-webkit-user-select:text}
 .title{text-align:center;font-size:1.25em;font-weight:700;border:1px solid var(--dim);border-radius:12px;padding:6px;margin-bottom:10px}
 .bsm{text-align:center;margin-bottom:8px}
 .v{cursor:pointer}.v.on{background:var(--hl,#2a3a7a);border-radius:6px}.n{color:var(--dim);font-weight:400;font-size:.7em}
@@ -47,6 +47,7 @@ header button{padding:9px 8px}
 .nt small{display:block;color:var(--dim);font:12px system-ui;margin:4px 0}
 #nb textarea{width:100%;min-height:54px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px;font:15px system-ui;resize:vertical}
 .nt .bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.nt .bt button,#nall{padding:6px 10px;font-size:13px}#nall{margin:8px 0}
+.al{display:flex;gap:8px}.alb{flex:1;padding:10px 6px;font-size:13px}.alb.a{background:var(--fg);color:var(--bg);font-weight:700}
 </style></head><body>
 <header><select id="sel" aria-label="Sourate"></select><button id="bi" aria-label="Index">☰</button><button id="bs" aria-label="Rechercher">🔍</button><button id="bnp" aria-label="Bloc-notes">📝</button><button id="bcfg" aria-label="Réglages">⚙</button><button id="fsb" aria-label="Plein écran">⛶</button></header>
 <button id="fx" aria-label="Quitter le plein écran">✕</button>
@@ -137,16 +138,16 @@ $("il").onclick=e=>{const x=e.target.closest(".ix");if(!x)return;$("ip").classLi
 /* Réglages : police + fond */
 const FONTS=[["warsh","Warsh (Uthmanic)",'"Warsh","Scheherazade New","Amiri Quran",serif'],["taha","Uthman Taha",'"UthmanTaha","Scheherazade New","Amiri Quran",serif'],["sch","Scheherazade New",'"Scheherazade New","Noto Naskh Arabic",serif'],["amq","Amiri Quran",'"Amiri Quran","Scheherazade New",serif'],["ami","Amiri",'"Amiri","Scheherazade New",serif'],["nsk","Noto Naskh",'"Noto Naskh Arabic","Scheherazade New",serif'],["lat","Lateef",'"Lateef","Scheherazade New",serif']];
 const THEMES=[["Bleu nuit · jaune","#0a1330","#121d45","#ffd84a","#b9a23a","#25356e","#2a3a7a"],["Noir · blanc","#000000","#141414","#f2f2f2","#9a9a9a","#2e2e2e","#2e2e2e"],["Noir · vert","#000000","#0d1a0d","#86e08f","#4f8f58","#1f3a22","#1f3a22"],["Vert mushaf · or","#0b3d2e","#0f4d3a","#f0d27a","#b9a766","#1f6b52","#1a6a50"],["Papier crème · brun","#f6ecd2","#eadcb8","#3b2a14","#7a6440","#d3c299","#e3d3a6"],["Blanc · noir","#ffffff","#eef0f5","#111111","#666666","#d5d8e0","#e3e7f3"],["Marine · crème","#10233f","#17325a","#f4efe0","#a8b4c8","#2c4a7a","#2c4a7a"],["Brun nuit · ambre","#1c130c","#2a1d12","#ffbf5e","#b58a4a","#4a3320","#3a2816"]];
-const LH=[1.6,1.8,2,2.1,2.4,2.8,3.2];let fnt=store.get("font","warsh"),thm=store.get("theme",0),li=store.get("li",3);
+const LH=[1.6,1.8,2,2.1,2.4,2.8,3.2];let fnt=store.get("font","warsh"),thm=store.get("theme",0),li=store.get("li",3);const TA=[["justify","Justifié · مضبوط"],["right","À droite · يمين"],["center","Centré · وسط"]];let al=store.get("al",0);
 function applyLook(){const f=FONTS.find(x=>x[0]==fnt)||FONTS[0],t=THEMES[thm]||THEMES[0],s=document.documentElement.style;
- s.setProperty("--ff",f[2]);s.setProperty("--lh",LH[li]||2.1);["--bg","--bg2","--fg","--dim","--line","--hl"].forEach((k,i)=>s.setProperty(k,t[i+1]));
+ s.setProperty("--ff",f[2]);s.setProperty("--lh",LH[li]||2.1);s.setProperty("--ta",(TA[al]||TA[0])[0]);["--bg","--bg2","--fg","--dim","--line","--hl"].forEach((k,i)=>s.setProperty(k,t[i+1]));
  const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t[1]}
 function cfgRender(){$("cb").innerHTML='<h3>الخط · Police</h3>'+FONTS.map(f=>'<div class="opt'+(f[0]==fnt?' a':'')+'" data-f="'+f[0]+'" style="font-family:'+f[2].replace(/"/g,"'")+'"><span>'+f[1]+'</span><b>بِسْمِ اِ۬للَّهِ اِ۬لرَّحْمَٰنِ</b></div>').join("")
  +'<h3>الخلفية · Fond</h3><div class="th">'+THEMES.map((t,i)=>'<div class="sw'+(i==thm?' a':'')+'" data-t="'+i+'" style="background:'+t[1]+';color:'+t[3]+';border-color:'+t[4]+'"><b>بِسْمِ اللَّهِ</b><small>'+t[0]+'</small></div>').join("")
- +'</div><h3>الارتفاع · Interligne</h3><div class="stp"><button data-l="-1">−</button><b>'+LH[li]+'</b><button data-l="1">+</button></div><div class="hint">Warsh et Uthman Taha s’affichent si leur fichier de police est installé (dans l’APK : dossier fonts). Sinon, une police voisine est utilisée.</div>'}
+ +'</div><h3>الارتفاع · Interligne</h3><div class="stp"><button data-l="-1">−</button><b>'+LH[li]+'</b><button data-l="1">+</button></div><h3>المحاذاة · Alignement</h3><div class="al">'+TA.map((a,i)=>'<button class="alb'+(i==al?' a':'')+'" data-al="'+i+'">'+a[1]+'</button>').join("")+'</div><div class="hint">Warsh et Uthman Taha s’affichent si leur fichier de police est installé (dans l’APK : dossier fonts). Sinon, une police voisine est utilisée.</div>'}
 $("bcfg").onclick=()=>{setPlay(false);cfgRender();$("cfg").classList.add("open")};
 $("cx").onclick=()=>$("cfg").classList.remove("open");
-$("cb").onclick=e=>{const l=e.target.closest("[data-l]");if(l){li=Math.max(0,Math.min(LH.length-1,li+(+l.dataset.l)));store.set("li",li);applyLook();cfgRender();return}const o=e.target.closest(".opt"),w=e.target.closest(".sw");if(o){fnt=o.dataset.f;store.set("font",fnt)}else if(w){thm=+w.dataset.t;store.set("theme",thm)}else return;applyLook();cfgRender()};
+$("cb").onclick=e=>{const l=e.target.closest("[data-l]");if(l){li=Math.max(0,Math.min(LH.length-1,li+(+l.dataset.l)));store.set("li",li);applyLook();cfgRender();return}const a=e.target.closest("[data-al]");if(a){al=+a.dataset.al;store.set("al",al);applyLook();cfgRender();return}const o=e.target.closest(".opt"),w=e.target.closest(".sw");if(o){fnt=o.dataset.f;store.set("font",fnt)}else if(w){thm=+w.dataset.t;store.set("theme",thm)}else return;applyLook();cfgRender()};
 /* Polices personnalisées (APK) : tout fichier .ttf/.otf du dossier fonts */
 try{if(window.Android&&Android.fonts){JSON.parse(Android.fonts()).forEach(fn=>{
  const base=fn.replace(/\.[^.]+$/,""),fam="F_"+base.replace(/[^A-Za-z0-9]/g,"_"),url="url('fonts/"+encodeURI(fn)+"')";
