@@ -48,6 +48,7 @@ header button{padding:9px 8px}
 #nb textarea{width:100%;min-height:54px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px;font:15px system-ui;resize:vertical}
 .nt .bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.nt .bt button,#nall{padding:6px 10px;font-size:13px}#nall{margin:8px 0}
 .al{display:flex;gap:8px}.alb{flex:1;padding:10px 6px;font-size:13px}.alb.a{background:var(--fg);color:var(--bg);font-weight:700}
+body.playing *{-webkit-tap-highlight-color:transparent}body.playing #text{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style></head><body>
 <header><select id="sel" aria-label="Sourate"></select><button id="bi" aria-label="Index">☰</button><button id="bs" aria-label="Rechercher">🔍</button><button id="bnp" aria-label="Bloc-notes">📝</button><button id="bcfg" aria-label="Réglages">⚙</button><button id="fsb" aria-label="Plein écran">⛶</button></header>
 <button id="fx" aria-label="Quitter le plein écran">✕</button>
@@ -76,7 +77,7 @@ function render(i,vi){cur=i;store.set("cur",i);$("sel").value=i;const s=D[i];let
  $("lbl").textContent="سورة "+s.n+" · "+s.v.length+" آية"}
 $("sel").onchange=e=>render(+e.target.value);
 $("text").addEventListener("click",e=>{if(e.target.id=="nx"){render(cur+1);return}
- if(String(getSelection()))return;const v=e.target.closest(".v");if(!v)return;
+ if(playing||String(getSelection()))return;const v=e.target.closest(".v");if(!v)return;
  document.querySelectorAll(".v.on").forEach(x=>x.classList.remove("on"));v.classList.add("on");
  pick={i:cur,k:+v.dataset.k};$("ref").textContent=D[cur].n+" — "+(pick.k+1);$("sheet").style.display="flex";refBk()});
 function refBk(){refNT();$("bk").textContent=marks.some(m=>m[0]==pick.i&&m[1]==pick.k)?"★ Retirer":"☆ Signet"}
@@ -92,7 +93,7 @@ function tick(t){if(!playing)return;const dt=Math.min(.1,(t-last)/1000);last=t;a
  if(acc>=1){const p=Math.floor(acc);acc-=p;const y=scrollY;window.scrollBy(0,p);
   if(Math.abs(scrollY-y)<1&&y>200){if(cur<113)render(cur+1);else setPlay(false)}}
  requestAnimationFrame(tick)}
-function setPlay(on){playing=on;$("play").textContent=on?"⏸":"▶";if(on){last=performance.now();acc=0;requestAnimationFrame(tick)}}
+function setPlay(on){playing=on;document.body.classList.toggle("playing",on);if(on)closeSheet();$("play").textContent=on?"⏸":"▶";if(on){last=performance.now();acc=0;requestAnimationFrame(tick)}}
 $("play").onclick=()=>setPlay(!playing);function setSpd(n){lvl=Math.max(1,Math.min(10,n));store.set("lvl",lvl);$("vn").textContent=lvl}
 $("vm").onclick=()=>setSpd(lvl-1);$("vp").onclick=()=>setSpd(lvl+1);
 /* Recherche */
