@@ -88,15 +88,13 @@ $("bsh").onclick=()=>{const t=vt(pick);if(window.Android&&Android.share)Android.
 $("bk").onclick=()=>{const j=marks.findIndex(m=>m[0]==pick.i&&m[1]==pick.k);j>=0?marks.splice(j,1):marks.push([pick.i,pick.k]);store.set("marks",marks);refBk()};
 $("sm").onclick=()=>setFs(fs-2);$("sp").onclick=()=>setFs(fs+2);
 function setFs(n){fs=Math.max(18,Math.min(60,n));store.set("fs",fs);document.documentElement.style.setProperty("--fs",fs+"px")}
-function tick(t){if(!playing)return;const dt=Math.min(.1,(t-last)/1000);last=t;acc+=SPEEDS[lvl-1]*dt;
+function tick(t){if(!playing)return;const dt=Math.min(.1,(t-last)/1000);last=t;acc+=SPEEDS[lvl-1]*dt;if(document.querySelector("#panel.open,#ip.open,#cfg.open,#np.open")){acc=0;requestAnimationFrame(tick);return}
  if(acc>=1){const p=Math.floor(acc);acc-=p;const y=scrollY;window.scrollBy(0,p);
   if(Math.abs(scrollY-y)<1&&y>200){if(cur<113)render(cur+1);else setPlay(false)}}
  requestAnimationFrame(tick)}
 function setPlay(on){playing=on;$("play").textContent=on?"⏸":"▶";if(on){last=performance.now();acc=0;requestAnimationFrame(tick)}}
 $("play").onclick=()=>setPlay(!playing);function setSpd(n){lvl=Math.max(1,Math.min(10,n));store.set("lvl",lvl);$("vn").textContent=lvl}
 $("vm").onclick=()=>setSpd(lvl-1);$("vp").onclick=()=>setSpd(lvl+1);
-addEventListener("touchstart",e=>{if(playing&&!e.target.closest("#bar"))setPlay(false)},{passive:true});
-addEventListener("wheel",()=>{if(playing)setPlay(false)},{passive:true});
 /* Recherche */
 const norm=s=>{let o="",m=[];for(let i=0;i<s.length;i++){let c=s[i],k=c.charCodeAt(0);
  if((k>=0x64B&&k<=0x65F)||k==0x670||(k>=0x6D6&&k<=0x6ED)||k==0x640)continue;
@@ -112,7 +110,7 @@ function search(){const res=$("res"),qs=$("q").value.trim();
   const t=clean(D[i],k),a=n.m[p],b=n.m[p+q.length-1];let e=b+1;while(e<t.length&&/[\u064B-\u065F\u0670\u06D6-\u06ED]/.test(t[e]))e++;
   h+='<div class="r" data-i="'+i+'" data-k="'+k+'">'+t.slice(0,a)+"<mark>"+t.slice(a,e)+"</mark>"+t.slice(e)+'<small>سورة '+D[i].n+' · '+(k+1)+'</small></div>'}
  res.innerHTML='<div class="hint">'+tot+" résultat(s)"+(tot>80?" (80 premiers affichés)":"")+"</div>"+h}
-$("bs").onclick=()=>{$("panel").classList.add("open");setPlay(false);search();$("q").focus()};
+$("bs").onclick=()=>{$("panel").classList.add("open");search();$("q").focus()};
 $("pc").onclick=()=>$("panel").classList.remove("open");
 let to;$("q").oninput=()=>{clearTimeout(to);to=setTimeout(search,200)};
 $("res").onclick=e=>{if(String(getSelection()))return;const r=e.target.closest(".r");if(!r)return;$("panel").classList.remove("open");render(+r.dataset.i,+r.dataset.k)};
@@ -130,7 +128,7 @@ function idxRender(){const raw=$("is").value.trim(),f=sk(raw);let h="";
  else{const N=tab=="j"?30:60;for(let n=1;n<=N;n++){const p=locate(tab=="j"?2*n-1:n);if(raw&&String(n)!=raw&&!sk(D[p[0]].n).includes(f))continue;
   h+='<div class="ix" data-s="'+p[0]+'" data-v="'+p[1]+'"><span class="no">'+n+'</span><b>'+(tab=="j"?"الجزء ":"الحزب ")+ar(n)+'</b><small>'+D[p[0]].n+" · "+(p[1]+1)+'</small></div>'}}
  $("il").innerHTML=h||'<div class="hint">لا نتيجة</div>'}
-$("bi").onclick=()=>{setPlay(false);$("is").value="";$("ip").classList.add("open");idxRender()};
+$("bi").onclick=()=>{$("is").value="";$("ip").classList.add("open");idxRender()};
 $("ic").onclick=()=>$("ip").classList.remove("open");
 $("is").oninput=idxRender;
 document.querySelectorAll("#it button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#it button").forEach(x=>x.classList.remove("a"));b.classList.add("a");tab=b.dataset.t;idxRender()});
@@ -145,7 +143,7 @@ function applyLook(){const f=FONTS.find(x=>x[0]==fnt)||FONTS[0],t=THEMES[thm]||T
 function cfgRender(){$("cb").innerHTML='<h3>الخط · Police</h3>'+FONTS.map(f=>'<div class="opt'+(f[0]==fnt?' a':'')+'" data-f="'+f[0]+'" style="font-family:'+f[2].replace(/"/g,"'")+'"><span>'+f[1]+'</span><b>بِسْمِ اِ۬للَّهِ اِ۬لرَّحْمَٰنِ</b></div>').join("")
  +'<h3>الخلفية · Fond</h3><div class="th">'+THEMES.map((t,i)=>'<div class="sw'+(i==thm?' a':'')+'" data-t="'+i+'" style="background:'+t[1]+';color:'+t[3]+';border-color:'+t[4]+'"><b>بِسْمِ اللَّهِ</b><small>'+t[0]+'</small></div>').join("")
  +'</div><h3>الارتفاع · Interligne</h3><div class="stp"><button data-l="-1">−</button><b>'+LH[li]+'</b><button data-l="1">+</button></div><h3>المحاذاة · Alignement</h3><div class="al">'+TA.map((a,i)=>'<button class="alb'+(i==al?' a':'')+'" data-al="'+i+'">'+a[1]+'</button>').join("")+'</div><div class="hint">Warsh et Uthman Taha s’affichent si leur fichier de police est installé (dans l’APK : dossier fonts). Sinon, une police voisine est utilisée.</div>'}
-$("bcfg").onclick=()=>{setPlay(false);cfgRender();$("cfg").classList.add("open")};
+$("bcfg").onclick=()=>{cfgRender();$("cfg").classList.add("open")};
 $("cx").onclick=()=>$("cfg").classList.remove("open");
 $("cb").onclick=e=>{const l=e.target.closest("[data-l]");if(l){li=Math.max(0,Math.min(LH.length-1,li+(+l.dataset.l)));store.set("li",li);applyLook();cfgRender();return}const a=e.target.closest("[data-al]");if(a){al=+a.dataset.al;store.set("al",al);applyLook();cfgRender();return}const o=e.target.closest(".opt"),w=e.target.closest(".sw");if(o){fnt=o.dataset.f;store.set("font",fnt)}else if(w){thm=+w.dataset.t;store.set("theme",thm)}else return;applyLook();cfgRender()};
 /* Polices personnalisées (APK) : tout fichier .ttf/.otf du dossier fonts */
@@ -175,7 +173,7 @@ $("nb").onclick=e=>{const b=e.target.closest("button");if(!b)return;
  else if(b.dataset.a=="cp"){cpy(vtxt(x)+(x.note?"\n"+x.note:""));b.textContent="Copié ✓"}
  else if(b.dataset.a=="del"){NT.items.splice(n,1);saveNT();ntRender()}};
 $("bn").onclick=()=>{const j=hasNT(pick.i,pick.k);if(j>=0)NT.items.splice(j,1);else NT.items.push({i:pick.i,k:pick.k,note:""});saveNT();refNT()};
-$("bnp").onclick=()=>{setPlay(false);ntRender();$("np").classList.add("open")};
+$("bnp").onclick=()=>{ntRender();$("np").classList.add("open")};
 $("nx2").onclick=()=>$("np").classList.remove("open");
 /* Plein écran */
 function setFull(on){document.body.classList.toggle("full",on);try{if(window.Android&&Android.fullscreen)Android.fullscreen(on)}catch(_){}const d=document,e=d.documentElement;
